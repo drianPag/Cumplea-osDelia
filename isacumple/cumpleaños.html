@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cumpleaños Delia 🎉</title>
+    <style>
+        /* Estilo para la primera pantalla con imagen de fondo */
+        #screen1 {
+            background-image: url('./imagen/boticaria2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Estilo para la segunda pantalla con imagen de fondo */
+        #screen2 {
+            background-image: url('./imagen/kimetsu.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        :root {
+            --color-pink: #ff69b4;
+            --color-light-pink: #ffb6c1;
+            --color-bg-start: #ffe0f0;
+            --color-bg-end: #d1f1ff;
+            --color-button-bg: #ffd6e0;
+            --font-main: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-main);
+            overflow: hidden;
+        }
+
+        /* Pantallas principales */
+        .screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            /* Se ha quitado el fondo para que las imágenes se puedan ver */
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+        
+        .visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+            color: var(--color-pink);
+            text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.6);
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px #fff, 0 0 10px var(--color-pink), 0 0 15px var(--color-pink); }
+            100% { text-shadow: 0 0 10px #fff, 0 0 20px var(--color-light-pink), 0 0 30px var(--color-pink); }
+        }
+
+        /* Botones Kawaii */
+        .btn {
+            background-color: var(--color-button-bg);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            margin: 10px;
+            font-size: 1.2rem;
+            color: var(--color-pink);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--color-light-pink);
+            transform: scale(1.1);
+        }
+
+        .btn:focus {
+            outline: 2px solid var(--color-pink);
+            outline-offset: 2px;
+        }
+
+        /* Fuegos artificiales */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Modales (Galería y Música) */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            visibility: hidden;
+            opacity: 0;
+        }
+        
+        .modal.is-active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 2rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+        
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 10px;
+        }
+        
+        .image-gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .image-gallery img:hover {
+            transform: scale(1.05);
+        }
+
+        .music-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .music-player h2 {
+            color: var(--color-pink);
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <audio id="background-music" src="./musica/solares.mp3" loop></audio>
+
+    <canvas id="fireworks"></canvas>
+
+    <section id="screen1" class="screen visible">
+        <h1>🎉 ¡Felicidades Delia! 🎂<br>HOY ES UN GRAN DÍA UwU🎉</h1>
+        <button class="btn" id="start-btn">¡Vamos 7w7!</button>
+    </section>
+
+    <section id="screen2" class="screen hidden">
+        <h1>🎉Que tengas un muy feliz cumpleaños Delia o bueno Isa🎉 </h1>
+         <button class="btn" id="open-gallery-btn">📸 Imagen pixel </button>
+    <button class="btn" id="open-music-btn">🎶 Música</button>
+    <a href="cumpleaños2.html" class="btn">Mensaje...</a>
+</section>
+
+    <div id="gallery-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal="gallery-modal">&times;</span>
+            <h2>Galería de Recuerdos 💖</h2>
+            <div class="image-gallery">
+                <img src="./imagenes/foto1.jpg" alt="primer PixelArt">
+                <img src="./imagenes/foto2.png" alt="segundo PixelArt">
+            </div>
+        </div>
+    </div>
+
+    <div id="music-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-modal="music-modal">&times;</span>
+            <h2>Te dejo esta canción 🎵</h2>
+            <div class="music-player">
+                <audio controls loop>
+                    <source src="./musica/fyrex.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Lógica para el cambio de pantallas y modales ---
+        const screen1 = document.getElementById('screen1');
+        const screen2 = document.getElementById('screen2');
+        const startBtn = document.getElementById('start-btn');
+        const backgroundMusic = document.getElementById('background-music');
+        
+        const openGalleryBtn = document.getElementById('open-gallery-btn');
+        const openMusicBtn = document.getElementById('open-music-btn');
+
+        const galleryModal = document.getElementById('gallery-modal');
+        const musicModal = document.getElementById('music-modal');
+
+        const closeBtns = document.querySelectorAll('.close-btn');
+
+        // Función para cambiar de pantalla y reproducir la música
+        function startExperience() {
+            backgroundMusic.play();
+            screen1.classList.remove('visible');
+            screen1.classList.add('hidden');
+            screen2.classList.remove('hidden');
+            screen2.classList.add('visible');
+        }
+
+        // Iniciar al hacer clic en el botón de inicio
+        startBtn.addEventListener('click', startExperience);
+
+        // Abrir la galería al hacer clic
+        openGalleryBtn.addEventListener('click', () => {
+            galleryModal.classList.add('is-active');
+        });
+
+        // Abrir el reproductor de música al hacer clic
+        openMusicBtn.addEventListener('click', () => {
+            musicModal.classList.add('is-active');
+        });
+
+        // Cerrar los modales al hacer clic en la "x"
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const modalId = e.target.getAttribute('data-modal');
+                document.getElementById(modalId).classList.remove('is-active');
+            });
+        });
+
+        // --- Lógica para los fuegos artificiales ---
+        const canvas = document.getElementById('fireworks');
+        const ctx = canvas.getContext('2d');
+        let fireworks = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Firework {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height;
+                this.targetY = Math.random() * (canvas.height / 2);
+                this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+                this.speedY = Math.random() * -7 - 7;
+                this.exploded = false;
+                this.particles = [];
+                this.explosionSound = new Audio('./musica/explosion.mp3');
+            }
+
+            update() {
+                if (!this.exploded) {
+                    this.y += this.speedY;
+                    if (this.y <= this.targetY) {
+                        this.exploded = true;
+                        this.explosionSound.play();
+                        for (let i = 0; i < 150; i++) {
+                            this.particles.push(new Particle(this.x, this.y, this.color));
+                        }
+                    }
+                } else {
+                    this.particles = this.particles.filter(p => p.alpha > 0);
+                    this.particles.forEach(p => p.update());
+                }
+            }
+
+            draw() {
+                if (!this.exploded) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                } else {
+                    this.particles.forEach(p => p.draw());
+                }
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 5 + 3;
+                this.speedX = (Math.random() - 0.5) * 10;
+                this.speedY = (Math.random() - 0.5) * 10;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.015;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha -= this.decay;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (Math.random() < 0.08) {
+                fireworks.push(new Firework());
+            }
+            
+            fireworks = fireworks.filter(fw => !(fw.exploded && fw.particles.length === 0));
+            fireworks.forEach(fw => {
+                fw.update();
+                fw.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+
+</body>
+</html>
